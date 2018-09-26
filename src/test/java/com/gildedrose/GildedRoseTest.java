@@ -1,17 +1,81 @@
 package com.gildedrose;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import org.junit.Test;
+import java.util.stream.Stream;
 
-public class GildedRoseTest {
+import static com.gildedrose.ItemFactory.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.of;
+
+class GildedRoseTest {
 
     @Test
-    public void foo() {
-        Item[] items = new Item[] { new Item("foo", 0, 0) };
-        GildedRose app = new GildedRose(items);
+    void updateQuality_arrayOrderNotAltered() {
+        Item simpleItem = simpleItem(1, 1);
+        Item sulfuras = sulfuras(1, 1);
+        GildedRose app = new GildedRose(new Item[] { simpleItem, sulfuras });
         app.updateQuality();
-        assertEquals("fixme", app.items[0].name);
+        assertEquals(simpleItem.name, app.items[0].name);
+        assertEquals(sulfuras.name, app.items[1].name);
+    }
+
+    @Test
+    void updateQuality_emptyArrayNoException() {
+        GildedRose app = new GildedRose(new Item[] {});
+        app.updateQuality();
+    }
+
+    @ParameterizedTest
+    @MethodSource("createTestItems")
+    void updateQuality_OneSizeArrayUpdate(Item beforeUpdate, Item afterUpdateExpected) {
+
+        GildedRose app = new GildedRose(new Item[] { beforeUpdate });
+        app.updateQuality();
+        Item afterUpdateActual = app.items[0];
+
+        assertItemEquals(afterUpdateExpected, afterUpdateActual);
+    }
+
+    private static Stream<Arguments> createTestItems() {
+        return Stream.of(
+
+                of(simpleItem(10, 10), simpleItem(9, 9)),
+                of(simpleItem(10, 0), simpleItem(9, 0)),
+                of(simpleItem(1, 1), simpleItem(0, 0)),
+                of(simpleItem(0, 2), simpleItem(-1, 0)),
+                of(simpleItem(-1, 1), simpleItem(-2, 0)),
+                of(simpleItem(-1, 4), simpleItem(-2, 2)),
+
+                of(brie(10, 1), brie(9, 2)),
+                of(brie(10, 50), brie(9, 50)),
+                of(brie(0, 10), brie(-1, 12)),
+                of(brie(-1, 10), brie(-2, 12)),
+
+                of(sulfuras(10, 80), sulfuras(10, 80)),
+                of(sulfuras(-1, 80), sulfuras(-1, 80)),
+
+                of(ticket(0, 10), ticket(-1, 0)),
+                of(ticket(-1, 10), ticket(-2, 0)),
+                of(ticket(1, 10), ticket(0, 13)),
+                of(ticket(1, 49), ticket(0, 50)),
+                of(ticket(10, 10), ticket(9, 12)),
+                of(ticket(10, 49), ticket(9, 50)),
+                of(ticket(11, 10), ticket(10, 11)),
+                of(ticket(11, 50), ticket(10, 50)),
+
+                of(conjured(10, 10), conjured(9, 8)),
+                of(conjured(0, 10), conjured(-1, 6))
+        );
+    }
+
+    private void assertItemEquals(Item afterUpdateExpected, Item afterUpdateActual) {
+        assertEquals(afterUpdateExpected.quality, afterUpdateActual.quality);
+        assertEquals(afterUpdateExpected.sellIn, afterUpdateActual.sellIn);
+        assertEquals(afterUpdateExpected.name, afterUpdateActual.name);
     }
 
 }

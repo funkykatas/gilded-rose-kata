@@ -3,7 +3,7 @@ apply plugin: 'findbugs'
 apply plugin: 'jacoco'
 
 ext {
-    junitVersion = '4.12'
+    junitJupiterParamsVerion = '5.3.1'
 }
 
 sourceCompatibility = 1.8
@@ -14,5 +14,5 @@ repositories {
 }
 
 dependencies {
-    testCompile "junit:junit:$junitVersion"
+    testCompile "org.junit.jupiter:junit-jupiter-params:$junitJupiterParamsVerion"
 }
