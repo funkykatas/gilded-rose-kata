@@ -1,11 +1,12 @@
-package com.gildedrose;
+package com.gildedrose.domain.item;
+
+import org.springframework.data.annotation.Id;
 
 public class Item {
 
+    @Id
     public String name;
-
     public int sellIn;
-
     public int quality;
 
     public Item(String name, int sellIn, int quality) {
@@ -14,8 +15,8 @@ public class Item {
         this.quality = quality;
     }
 
-   @Override
-   public String toString() {
+    @Override
+    public String toString() {
         return this.name + ", " + this.sellIn + ", " + this.quality;
     }
 }

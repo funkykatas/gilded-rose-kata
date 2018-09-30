@@ -1,6 +1,26 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE")
+    }
+}
+
 apply plugin: 'java'
 apply plugin: 'findbugs'
 apply plugin: 'jacoco'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+bootJar {
+    baseName = 'guilded-rose'
+    version =  '0.1.0'
+}
+
+repositories {
+    mavenCentral()
+}
 
 ext {
     junitJupiterParamsVerion = '5.3.1'
@@ -14,5 +34,7 @@ repositories {
 }
 
 dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
     testCompile "org.junit.jupiter:junit-jupiter-params:$junitJupiterParamsVerion"
 }

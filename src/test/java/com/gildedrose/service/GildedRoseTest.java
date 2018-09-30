@@ -1,5 +1,6 @@
-package com.gildedrose;
+package com.gildedrose.service;
 
+import com.gildedrose.domain.item.Item;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -7,7 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static com.gildedrose.ItemFactory.*;
+import static com.gildedrose.util.ItemFactory.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.of;
 
