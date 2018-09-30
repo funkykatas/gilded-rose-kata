@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemService {
@@ -24,6 +25,7 @@ public class ItemService {
     @PostConstruct
     @SuppressWarnings("unused")
     public void populateStorage() {
+        itemRepository.deleteAll();
         itemRepository.saveAll(
                 Arrays.asList(
                     ItemFactory.simpleItem(10, 10),
@@ -37,15 +39,21 @@ public class ItemService {
 
     @Scheduled(fixedRateString = "${updateItemsRateMillis}")
     @SuppressWarnings("unused")
-    public void updateItems() {
-        List<Item> items = getAllItems();
-        GildedRose gildedRose = new GildedRose(items.toArray(new Item[]{}));
-        gildedRose.updateItems();
-        itemRepository.saveAll(Arrays.asList(gildedRose.items));
+    void updateItems() {
+        // Most likely wouldn't be using common fork join pool in prod.
+        List<Item> updatedItems = getAllItems()
+                .parallelStream()
+                .map(this::getUpdatedItem)
+                .collect(Collectors.toList());
+        itemRepository.saveAll(updatedItems);
     }
 
     public List<Item> getAllItems() {
         return itemRepository.findAll();
+    }
+
+    private Item getUpdatedItem(Item item) {
+        return ItemType.findTypeByName(item.getName()).getUpdatedItem(item);
     }
 
 }

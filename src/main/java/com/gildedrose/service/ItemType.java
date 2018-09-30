@@ -45,9 +45,10 @@ public enum ItemType {
         this.updateQualityFunction = updateQualityFunction;
     }
 
-    void updateItem(Item item) {
-        item.quality = updateQualityFunction.apply(item.quality, item.sellIn);
-        item.sellIn = updateSellInFunction.apply(item.sellIn);
+    Item getUpdatedItem(Item item) {
+        int quality = updateQualityFunction.apply(item.getQuality(), item.getSellIn());
+        int sellIn = updateSellInFunction.apply(item.getSellIn());
+        return new Item(item.getName(), sellIn, quality);
     }
 
     static ItemType findTypeByName(String name) {

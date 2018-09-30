@@ -1,44 +1,39 @@
 package com.gildedrose.service;
 
 import com.gildedrose.domain.item.Item;
-import org.junit.jupiter.api.Test;
+import com.gildedrose.domain.item.ItemRepository;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.stream.Stream;
 
 import static com.gildedrose.util.ItemFactory.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.of;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-class GildedRoseTest {
+@ExtendWith(MockitoExtension.class)
+class ItemServiceTest {
 
-    @Test
-    void updateQuality_arrayOrderNotAltered() {
-        Item simpleItem = simpleItem(1, 1);
-        Item sulfuras = sulfuras(1, 1);
-        GildedRose app = new GildedRose(new Item[] { simpleItem, sulfuras });
-        app.updateItems();
-        assertEquals(simpleItem.name, app.items[0].name);
-        assertEquals(sulfuras.name, app.items[1].name);
-    }
+    @Mock
+    @SuppressWarnings("unused")
+    private ItemRepository itemRepository;
 
-    @Test
-    void updateQuality_emptyArrayNoException() {
-        GildedRose app = new GildedRose(new Item[] {});
-        app.updateItems();
-    }
+    @InjectMocks
+    private ItemService itemService;
 
     @ParameterizedTest
     @MethodSource("createTestItems")
     void updateQuality_OneSizeArrayUpdate(Item beforeUpdate, Item afterUpdateExpected) {
-
-        GildedRose app = new GildedRose(new Item[] { beforeUpdate });
-        app.updateItems();
-        Item afterUpdateActual = app.items[0];
-
-        assertItemEquals(afterUpdateExpected, afterUpdateActual);
+        when(itemService.getAllItems()).thenReturn(Collections.singletonList(beforeUpdate));
+        itemService.updateItems();
+        verify(itemRepository).saveAll(Collections.singletonList(afterUpdateExpected));
     }
 
     private static Stream<Arguments> createTestItems() {
@@ -100,12 +95,6 @@ class GildedRoseTest {
                 of(conjured(10, 10), conjured(9, 8)),
                 of(conjured(0, 10), conjured(-1, 6))
         );
-    }
-
-    private void assertItemEquals(Item afterUpdateExpected, Item afterUpdateActual) {
-        assertEquals(afterUpdateExpected.quality, afterUpdateActual.quality);
-        assertEquals(afterUpdateExpected.sellIn, afterUpdateActual.sellIn);
-        assertEquals(afterUpdateExpected.name, afterUpdateActual.name);
     }
 
 }
